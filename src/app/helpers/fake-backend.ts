@@ -108,9 +108,9 @@ export class FakeBackend implements HttpInterceptor {
       return { id, title, firstName, lastName, email, role };
     }
 
-    function idFromUrl(): string {
+    function idFromUrl(): number {
       const urlParts = url.split('/');
-      return parseInt(urlParts[urlParts.length - 1]).toString();
+      return parseInt(urlParts[urlParts.length - 1]);
     }
 
     function newUserId(): number {

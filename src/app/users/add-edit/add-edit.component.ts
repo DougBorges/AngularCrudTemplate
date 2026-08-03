@@ -25,7 +25,7 @@ interface UserFormGroup {
 })
 export class AddEditComponent implements OnInit {
   form!: FormGroup<UserFormGroup>;
-  id!: string;
+  id?: number;
   isAddMode!: boolean;
   loading = false;
   submitted = false;
@@ -61,7 +61,7 @@ export class AddEditComponent implements OnInit {
     });
 
     if (!this.isAddMode) {
-      this.userService.getById(this.id)
+      this.userService.getById(this.id!.valueOf())
         .pipe(first())
         .subscribe(x => this.form.patchValue(x));
     }
@@ -113,7 +113,7 @@ export class AddEditComponent implements OnInit {
   private updateUser() {
     const user = this.convertFormGroupToUser();
 
-    this.userService.update(this.id, user)
+    this.userService.update(this.id!.valueOf(), user)
       .pipe(first())
       .subscribe({
         next: () => {
@@ -129,6 +129,7 @@ export class AddEditComponent implements OnInit {
 
   private convertFormGroupToUser(): User {
     const user: User = {
+      id: this.id,
       title: this.form.value.title || '',
       firstName: this.form.value.firstName || '',
       lastName: this.form.value.lastName || '',

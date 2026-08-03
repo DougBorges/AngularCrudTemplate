@@ -14,7 +14,7 @@ export class UserService {
     return this.http.get<User[]>(baseUrl);
   }
 
-  getById(id: string) {
+  getById(id: number) {
     return this.http.get<User>(`${baseUrl}/${id}`);
   }
 
@@ -22,11 +22,11 @@ export class UserService {
     return this.http.post(baseUrl, params);
   }
 
-  update(id: string, params: User) {
+  update(id: number, params: User) {
     return this.http.put(`${baseUrl}/${id}`, params);
   }
 
-  delete(id: string) {
+  delete(id: number) {
     return this.http.delete(`${baseUrl}/${id}`);
   }
 }
