@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-import { fakeBackendProvider } from '@app/helpers';
+//import { fakeBackendProvider } from '@app/helpers';
 import { AppRoutingModule } from '@app/app-routing.module';
 import { AppComponent } from '@app/app.component';
 import { AlertComponent } from '@app/alert';
@@ -21,10 +21,9 @@ import { HomeComponent } from '@app/home';
     AlertComponent,
     HomeComponent
   ],
-  providers: [
-    // provider used to create fake backend
-    fakeBackendProvider
-  ],
+  //providers: [
+  //  fakeBackendProvider
+  //],
   bootstrap: [AppComponent]
 })
 export class AppModule { };

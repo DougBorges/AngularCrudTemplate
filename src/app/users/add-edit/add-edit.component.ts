@@ -25,7 +25,7 @@ interface UserFormGroup {
 })
 export class AddEditComponent implements OnInit {
   form!: FormGroup<UserFormGroup>;
-  id?: number;
+  id: number = -1;
   isAddMode!: boolean;
   loading = false;
   submitted = false;
@@ -42,7 +42,6 @@ export class AddEditComponent implements OnInit {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
 
-    // password not required in edit mode
     const passwordValidators = [Validators.minLength(6)];
     if (this.isAddMode) {
       passwordValidators.push(Validators.required);
@@ -63,7 +62,10 @@ export class AddEditComponent implements OnInit {
     if (!this.isAddMode) {
       this.userService.getById(this.id!.valueOf())
         .pipe(first())
-        .subscribe(x => this.form.patchValue(x));
+        .subscribe({
+          next: user => this.form.patchValue(user),
+          error: error => this.alertService.error(error)
+        });
     }
   }
 
@@ -71,16 +73,13 @@ export class AddEditComponent implements OnInit {
     return MustMatch(group, nameOf<UserFormGroup>().password, nameOf<UserFormGroup>().confirmPassword);
   }
 
-  // convenience getter for easy access to form fields
   get f() { return this.form.controls; }
 
   onSubmit() {
     this.submitted = true;
 
-    // reset alerts on submit
     this.alertService.clear();
 
-    // stop here if form is invalid
     if (this.form.invalid) {
       return;
     }
@@ -134,7 +133,9 @@ export class AddEditComponent implements OnInit {
       firstName: this.form.value.firstName || '',
       lastName: this.form.value.lastName || '',
       email: this.form.value.email || '',
-      role: this.form.value.role || Role.User
+      role: this.form.value.role || Role.User,
+      password: this.form.value.password || '',
+      isDeleting: false
     }
 
     return user;

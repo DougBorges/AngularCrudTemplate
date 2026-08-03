@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-import { UserService } from '@app/services';
+import { AlertService, UserService } from '@app/services';
+import { User } from '@app/models/user';
 
 @Component({
   standalone: false,
@@ -10,21 +12,54 @@ import { UserService } from '@app/services';
   styleUrl: 'list.component.css'
 })
 export class ListComponent implements OnInit {
-  users: any[] | undefined;
+  users$: Observable<User[]> = new Observable();
+  users: User[] = [];
+  loading: boolean = true;
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private userService: UserService,
+    private alertService: AlertService
+  ) { }
 
-  ngOnInit() {
-    this.userService.getAll()
+  ngOnInit() { this.loadAllUsers(); }
+
+  loadAllUsers() {
+    this.users$ = this.userService.getAll();
+
+    this.users$
       .pipe(first())
-      .subscribe(users => this.users = users);
+      .subscribe({
+        next: users => {
+          this.users = users || [];
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: error => {
+          this.alertService.error(error);
+          this.loading = false;
+        }
+      });
   }
 
   deleteUser(id: number) {
-    const user = this.users?.find(x => x.id === id);
+    const user = this.users.find(x => x.id === id);
+    if (!user) return;
+
+    this.loading = true;
+
     user.isDeleting = true;
+
     this.userService.delete(id)
       .pipe(first())
-      .subscribe(() => this.users = this.users?.filter(x => x.id !== id));
+      .subscribe({
+        next: () => {
+          window.location.reload();
+        },
+        error: error => {
+          this.alertService.error(error);
+          this.loading = false;
+        }
+      });
   }
 }

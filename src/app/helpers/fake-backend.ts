@@ -7,7 +7,8 @@ import { Role, User } from '@app/models';
 
 // array in local storage for registered users
 const usersKey = 'angular-master-details-crud-example-users';
-let users: User[] = JSON.parse(localStorage.getItem(usersKey) || '[]') || [{
+
+let users: User[] = JSON.parse(localStorage.getItem(usersKey) || '[]') as User[] || [{
   id: 1,
   title: 'Mr',
   firstName: 'Joe',
@@ -15,7 +16,7 @@ let users: User[] = JSON.parse(localStorage.getItem(usersKey) || '[]') || [{
   email: 'joe@bloggs.com',
   role: Role.User,
   password: 'joe123'
-}];
+} as User];
 
 @Injectable()
 export class FakeBackend implements HttpInterceptor {
@@ -42,8 +43,6 @@ export class FakeBackend implements HttpInterceptor {
       }
     }
 
-    // route functions
-
     function getUsers() {
       return ok(users.map(x => basicDetails(x)));
     }
@@ -60,7 +59,6 @@ export class FakeBackend implements HttpInterceptor {
         return error(`User with the email ${user.email} already exists`);
       }
 
-      // assign user id and a few other properties then save
       user.id = newUserId();
       delete user.confirmPassword;
       users.push(user);
@@ -73,12 +71,10 @@ export class FakeBackend implements HttpInterceptor {
       let params = body;
       let user: User = users.find(x => x.id === idFromUrl()) || new User();
 
-      // only update password if entered
       if (!params.password) {
         delete params.password;
       }
 
-      // update and save user
       Object.assign(user, params);
       localStorage.setItem(usersKey, JSON.stringify(users));
 
@@ -91,8 +87,6 @@ export class FakeBackend implements HttpInterceptor {
       return ok();
     }
 
-    // helper functions
-
     function ok(body?: any): Observable<HttpResponse<any>> {
       return of(new HttpResponse({ status: 200, body }))
         .pipe(delay(500)); // delay observable to simulate server api call
@@ -104,8 +98,14 @@ export class FakeBackend implements HttpInterceptor {
     }
 
     function basicDetails(user: User): User {
-      const { id, title, firstName, lastName, email, role } = user;
-      return { id, title, firstName, lastName, email, role };
+      return {
+        id: user.id,
+        title: user.title,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+      } as User;
     }
 
     function idFromUrl(): number {
